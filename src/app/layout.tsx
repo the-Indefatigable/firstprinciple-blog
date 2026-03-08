@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,33 +23,37 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Prevent flash of wrong theme */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('fp-theme');var r=t==='dark'?'dark':t==='light'?'light':window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',r)}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body>
-        {/* ── Header ── */}
-        <header className="blog-header">
-          <div className="blog-header-inner">
-            <a href="https://www.firstprincipleslearningg.com" className="blog-header-logo">
-              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#d97706" />
-                    <stop offset="100%" stopColor="#b45309" />
-                  </linearGradient>
-                </defs>
-                <rect width="100" height="100" rx="20" fill="url(#g)" />
-                <text x="50" y="50" textAnchor="middle" dominantBaseline="central"
-                  fontFamily="sans-serif" fontWeight="800" fontSize="52" fill="white">fp</text>
-              </svg>
-              FirstPrinciple
+        {/* ── Navbar ── */}
+        <nav className="navbar">
+          <div className="navbar-inner">
+            <a
+              href="https://www.firstprincipleslearningg.com"
+              className="navbar-brand"
+            >
+              <div className="navbar-logo-mark">fp</div>
+              <div className="navbar-logo-text">FirstPrinciple</div>
             </a>
-            <nav className="blog-header-nav">
-              <a href="/blog">Blog</a>
-              <a href="https://www.firstprincipleslearningg.com/math">Math Tools</a>
-              <a href="https://www.firstprincipleslearningg.com/physics">Physics</a>
-              <a href="https://www.firstprincipleslearningg.com/cs">CS Tools</a>
-            </nav>
+
+            <a
+              className="navbar-cta"
+              href="https://www.firstprincipleslearningg.com"
+            >
+              ← Back to Home
+            </a>
+
+            <ThemeToggle />
           </div>
-        </header>
+        </nav>
 
         {children}
 
@@ -56,7 +61,10 @@ export default function RootLayout({
         <footer className="blog-footer">
           <p>
             © {new Date().getFullYear()} FirstPrinciple Tutoring ·
-            <a href="https://www.firstprincipleslearningg.com" style={{ marginLeft: 6 }}>
+            <a
+              href="https://www.firstprincipleslearningg.com"
+              style={{ marginLeft: 6 }}
+            >
               Back to main site →
             </a>
           </p>
