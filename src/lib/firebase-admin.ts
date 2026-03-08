@@ -37,7 +37,6 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
 
         const snap = await db
             .collection('posts')
-            .orderBy('createdAt', 'desc')
             .get();
 
         return snap.docs
@@ -54,7 +53,8 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
                     updatedAt: d.updatedAt?.toDate?.()?.toISOString() || '',
                 };
             })
-            .filter((p) => p.published);
+            .filter((p) => p.published)
+            .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
     } catch (err) {
         console.error('[blog] Failed to fetch posts:', err);
         return [];
