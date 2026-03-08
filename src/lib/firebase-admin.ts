@@ -5,16 +5,31 @@ function getDb() {
     if (!getApps().length) {
         const projectId = process.env.FB_PROJECT_ID;
         const clientEmail = process.env.FB_CLIENT_EMAIL;
-        const privateKey = process.env.FB_PRIVATE_KEY?.replace(/\\n/g, '\n');
+        let privateKey = process.env.FB_PRIVATE_KEY;
+
+        console.log('[blog] FB_PROJECT_ID:', projectId ? '✓ set' : '✗ missing');
+        console.log('[blog] FB_CLIENT_EMAIL:', clientEmail ? '✓ set' : '✗ missing');
+        console.log('[blog] FB_PRIVATE_KEY:', privateKey ? `✓ set (${privateKey.length} chars)` : '✗ missing');
 
         if (!projectId || !clientEmail || !privateKey) {
             console.error('[blog] Firebase credentials not found — returning empty posts');
             return null;
         }
 
-        initializeApp({
-            credential: cert({ projectId, clientEmail, privateKey }),
-        });
+        // Handle various private key formats from Vercel env vars
+        if (privateKey.includes('\\n')) {
+            privateKey = privateKey.replace(/\\n/g, '\n');
+        }
+
+        try {
+            initializeApp({
+                credential: cert({ projectId, clientEmail, privateKey }),
+            });
+            console.log('[blog] Firebase Admin initialized successfully');
+        } catch (initErr) {
+            console.error('[blog] Firebase Admin init FAILED:', initErr);
+            return null;
+        }
     }
     return getFirestore();
 }
@@ -33,13 +48,16 @@ export interface BlogPost {
 export async function getPublishedPosts(): Promise<BlogPost[]> {
     try {
         const db = getDb();
-        if (!db) return [];
+        if (!db) {
+            console.error('[blog] getDb() returned null');
+            return [];
+        }
 
-        const snap = await db
-            .collection('posts')
-            .get();
+        console.log('[blog] Fetching all posts from collection "posts"...');
+        const snap = await db.collection('posts').get();
+        console.log('[blog] Fetched', snap.size, 'total documents');
 
-        return snap.docs
+        const posts = snap.docs
             .map((doc) => {
                 const d = doc.data();
                 return {
@@ -55,8 +73,11 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
             })
             .filter((p) => p.published)
             .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+        console.log('[blog] Published posts:', posts.length);
+        return posts;
     } catch (err) {
-        console.error('[blog] Failed to fetch posts:', err);
+        console.error('[blog] FETCH ERROR:', err);
         return [];
     }
 }
