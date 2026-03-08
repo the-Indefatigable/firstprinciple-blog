@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { posts } from "./posts";
+import { getPublishedPosts, readingTime } from "@/lib/firebase-admin";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,7 +9,20 @@ export const metadata: Metadata = {
     alternates: { canonical: "https://www.firstprincipleslearningg.com/blog" },
 };
 
-export default function BlogIndex() {
+export const revalidate = 60; // ISR: re-generate every 60 seconds
+
+export default async function BlogIndex() {
+    const posts = await getPublishedPosts();
+
+    const formatDate = (iso: string) => {
+        if (!iso) return "";
+        return new Date(iso).toLocaleDateString("en-CA", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+    };
+
     return (
         <main className="blog-container">
             <section className="blog-hero">
@@ -27,25 +40,31 @@ export default function BlogIndex() {
                 </p>
             </section>
 
-            <div className="post-grid">
-                {posts.map((post) => (
-                    <Link
-                        key={post.slug}
-                        href={`/blog/${post.slug}`}
-                        className="post-card"
-                    >
-                        <div className="post-card-meta">
-                            <span className="post-card-tag">{post.tag}</span>
-                            <span>{post.date}</span>
-                            <span>·</span>
-                            <span>{post.readTime}</span>
-                        </div>
-                        <h2>{post.title}</h2>
-                        <p>{post.description}</p>
-                        <span className="post-card-read">Read article →</span>
-                    </Link>
-                ))}
-            </div>
+            {posts.length === 0 ? (
+                <div className="blog-empty">
+                    <p>No articles yet. Check back soon!</p>
+                </div>
+            ) : (
+                <div className="post-grid">
+                    {posts.map((post) => (
+                        <Link
+                            key={post.slug}
+                            href={`/blog/${post.slug}`}
+                            className="post-card"
+                        >
+                            <div className="post-card-meta">
+                                <span className="post-card-tag">{post.tag}</span>
+                                <span>{formatDate(post.createdAt)}</span>
+                                <span>·</span>
+                                <span>{readingTime(post.content)}</span>
+                            </div>
+                            <h2>{post.title}</h2>
+                            <p>{post.description}</p>
+                            <span className="post-card-read">Read article →</span>
+                        </Link>
+                    ))}
+                </div>
+            )}
         </main>
     );
 }
