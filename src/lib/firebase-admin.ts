@@ -37,23 +37,24 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
 
         const snap = await db
             .collection('posts')
-            .where('published', '==', true)
             .orderBy('createdAt', 'desc')
             .get();
 
-        return snap.docs.map((doc) => {
-            const d = doc.data();
-            return {
-                slug: d.slug,
-                title: d.title,
-                description: d.description,
-                content: d.content,
-                tag: d.tag,
-                published: d.published,
-                createdAt: d.createdAt?.toDate?.()?.toISOString() || '',
-                updatedAt: d.updatedAt?.toDate?.()?.toISOString() || '',
-            };
-        });
+        return snap.docs
+            .map((doc) => {
+                const d = doc.data();
+                return {
+                    slug: d.slug,
+                    title: d.title,
+                    description: d.description,
+                    content: d.content,
+                    tag: d.tag,
+                    published: d.published,
+                    createdAt: d.createdAt?.toDate?.()?.toISOString() || '',
+                    updatedAt: d.updatedAt?.toDate?.()?.toISOString() || '',
+                };
+            })
+            .filter((p) => p.published);
     } catch (err) {
         console.error('[blog] Failed to fetch posts:', err);
         return [];
