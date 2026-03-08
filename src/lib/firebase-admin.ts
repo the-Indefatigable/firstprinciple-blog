@@ -31,17 +31,48 @@ export interface BlogPost {
 }
 
 export async function getPublishedPosts(): Promise<BlogPost[]> {
-    const db = getDb();
-    if (!db) return [];
+    try {
+        const db = getDb();
+        if (!db) return [];
 
-    const snap = await db
-        .collection('posts')
-        .where('published', '==', true)
-        .orderBy('createdAt', 'desc')
-        .get();
+        const snap = await db
+            .collection('posts')
+            .where('published', '==', true)
+            .orderBy('createdAt', 'desc')
+            .get();
 
-    return snap.docs.map((doc) => {
-        const d = doc.data();
+        return snap.docs.map((doc) => {
+            const d = doc.data();
+            return {
+                slug: d.slug,
+                title: d.title,
+                description: d.description,
+                content: d.content,
+                tag: d.tag,
+                published: d.published,
+                createdAt: d.createdAt?.toDate?.()?.toISOString() || '',
+                updatedAt: d.updatedAt?.toDate?.()?.toISOString() || '',
+            };
+        });
+    } catch (err) {
+        console.warn('[blog] Failed to fetch posts:', err);
+        return [];
+    }
+}
+
+export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+    try {
+        const db = getDb();
+        if (!db) return null;
+
+        const snap = await db
+            .collection('posts')
+            .where('slug', '==', slug)
+            .limit(1)
+            .get();
+
+        if (snap.empty) return null;
+        const d = snap.docs[0].data();
         return {
             slug: d.slug,
             title: d.title,
@@ -52,31 +83,10 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
             createdAt: d.createdAt?.toDate?.()?.toISOString() || '',
             updatedAt: d.updatedAt?.toDate?.()?.toISOString() || '',
         };
-    });
-}
-
-export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
-    const db = getDb();
-    if (!db) return null;
-
-    const snap = await db
-        .collection('posts')
-        .where('slug', '==', slug)
-        .limit(1)
-        .get();
-
-    if (snap.empty) return null;
-    const d = snap.docs[0].data();
-    return {
-        slug: d.slug,
-        title: d.title,
-        description: d.description,
-        content: d.content,
-        tag: d.tag,
-        published: d.published,
-        createdAt: d.createdAt?.toDate?.()?.toISOString() || '',
-        updatedAt: d.updatedAt?.toDate?.()?.toISOString() || '',
-    };
+    } catch (err) {
+        console.warn('[blog] Failed to fetch post:', slug, err);
+        return null;
+    }
 }
 
 export function readingTime(content: string): string {
