@@ -25,6 +25,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Non-blocking font loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@300;400;500;600;700;800&display=swap"
+        />
         {/* Prevent flash of wrong theme */}
         <script
           dangerouslySetInnerHTML={{
@@ -39,6 +46,7 @@ export default function RootLayout({
             <a
               href="https://www.firstprincipleslearningg.com"
               className="navbar-brand"
+              aria-label="FirstPrinciple - Back to main site"
             >
               <div className="navbar-logo-mark">fp</div>
               <div className="navbar-logo-text">FirstPrinciple</div>

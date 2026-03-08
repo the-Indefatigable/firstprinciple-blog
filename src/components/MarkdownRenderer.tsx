@@ -6,7 +6,12 @@ import remarkGfm from "remark-gfm";
 export default function MarkdownRenderer({ content }: { content: string }) {
     return (
         <div className="prose">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+            <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                skipHtml
+            >
+                {content}
+            </ReactMarkdown>
         </div>
     );
 }

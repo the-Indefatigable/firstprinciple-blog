@@ -8,7 +8,7 @@ function getDb() {
         const privateKey = process.env.FB_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
         if (!projectId || !clientEmail || !privateKey) {
-            console.warn('[blog] Firebase credentials not found — returning empty posts');
+            console.error('[blog] Firebase credentials not found — returning empty posts');
             return null;
         }
 
@@ -55,7 +55,7 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
             };
         });
     } catch (err) {
-        console.warn('[blog] Failed to fetch posts:', err);
+        console.error('[blog] Failed to fetch posts:', err);
         return [];
     }
 }
@@ -84,7 +84,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
             updatedAt: d.updatedAt?.toDate?.()?.toISOString() || '',
         };
     } catch (err) {
-        console.warn('[blog] Failed to fetch post:', slug, err);
+        console.error('[blog] Failed to fetch post:', slug, err);
         return null;
     }
 }

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@300;400;500;600;700;800&display=swap');
+/* Fonts loaded via <link> in layout.tsx for non-blocking render */
 
 /* ── Design System (matches main site) ── */
 :root {
@@ -464,6 +464,53 @@ a:hover {
   text-align: center;
   font-size: 0.8rem;
   color: var(--text-dim);
+}
+
+/* ── Blog Empty State ── */
+.blog-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-dim);
+}
+
+.blog-empty p {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+/* ── Markdown Tables (remark-gfm) ── */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 0.92rem;
+}
+
+.prose th,
+.prose td {
+  padding: 10px 14px;
+  border: 1px solid var(--border-warm);
+  text-align: left;
+}
+
+.prose th {
+  background: var(--bg-secondary);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.prose td {
+  color: var(--text-secondary);
+}
+
+/* ── Markdown Strikethrough & Task Lists ── */
+.prose del {
+  color: var(--text-dim);
+}
+
+.prose input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: var(--amber);
 }
 
 /* ── Responsive ── */

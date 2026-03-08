@@ -41,6 +41,7 @@ export default async function BlogPost({
     params: Promise<{ slug: string }>;
 }) {
     const { slug } = await params;
+    if (!slug || typeof slug !== 'string') notFound();
     const post = await getPostBySlug(slug);
     if (!post) notFound();
 
